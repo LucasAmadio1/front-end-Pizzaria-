@@ -1,4 +1,4 @@
-import styles from '../../styles/Home.module.scss'
+import styles from '../../styles/home.module.scss'
 
 import Head from 'next/head'
 import Image from 'next/image'
@@ -36,6 +36,9 @@ export default function Home() {
               Cadastrar
             </Button>
           </form>
+
+          <a className={styles.text}>Não possui uma conta? Cadastre-se</a>
+
         </div>
       </div>
     </>
