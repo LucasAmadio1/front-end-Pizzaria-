@@ -10,7 +10,11 @@ import logoImg from '../../public/logo.svg'
 import { Input } from '../componets/ui/Input'
 import { Button } from '../componets/ui/Button'
 
-import { AuthContext } from '../contexts/AuthContex'
+import { AuthContext } from '../contexts/AuthContext'
+
+import { toast } from 'react-toastify'
+
+import { canSSRGuest } from '../utils/canSSRGuest'
 
 export default function Home() {
   const { signIn } = useContext(AuthContext)
@@ -22,12 +26,21 @@ export default function Home() {
   async function handleLogin(event: FormEvent) {
     event.preventDefault();
 
+    if (email === '' || password === '') {
+      toast.warning('Preencha os campos')
+      
+      return;
+    }
+
+    setLoading(true)
+
     let data = {
       email,
       password
     }
 
     await signIn(data)
+    setLoading(false)
   }
 
   return (
@@ -57,7 +70,7 @@ export default function Home() {
 
             <Button 
               type="submit"
-              loading={false}
+              loading={loading}
             >
               Acessar
             </Button>
@@ -71,3 +84,9 @@ export default function Home() {
     </>
   )
 }
+
+export const getServerSideProps = canSSRGuest(async (context) => {
+  return {
+    props: {}
+  }
+})
