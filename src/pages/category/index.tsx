@@ -7,6 +7,8 @@ import { api } from '../../services/apiClient'
 import { Header } from '../../componets/Header'
 import { toast } from 'react-toastify'
 
+import { canSSRAuth } from '../../utils/canSSRAuth'
+
 export default function Category() {
   const [name, setName] = useState('')
   
@@ -14,14 +16,14 @@ export default function Category() {
     event.preventDefault()
 
     if (name === '') {
-      return toast.warning('Preencha todos os campos.')
+      return toast.warning('Preencha o campo antes de cadastrar.')
     }
 
     await api.post('/category', {
       name: name
     })
 
-    toast.success('Categoria criada com sucesso!')
+    toast.success('Categoria cadastrada com sucesso!')
     setName('')
   }
 
@@ -55,3 +57,9 @@ export default function Category() {
     </>
   )
 }
+
+export const getServerSideProps = canSSRAuth(async (context) => {
+  return {
+    props: {}
+  }
+})

@@ -11,7 +11,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return(
     <AuthProvider>
       <Component {...pageProps} />
-      <ToastContainer autoClose={2000}/>
+      <ToastContainer autoClose={2000} theme='dark'/>
     </AuthProvider>
     )
 }
