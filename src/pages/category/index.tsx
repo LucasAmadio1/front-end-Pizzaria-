@@ -16,7 +16,7 @@ export default function Category() {
     event.preventDefault()
 
     if (name === '') {
-      return toast.warning('Preencha o campo antes de cadastrar.')
+      return toast.warning('Preencha todos os campos.')
     }
 
     await api.post('/category', {
