@@ -9,6 +9,7 @@ import { Header } from "../../componets/Header"
 import { ModalOrder } from '../../componets/ModalOrder'
 
 import Modal from 'react-modal'
+import { toast } from "react-toastify"
 
 type OrderProps = {
   id: string,
@@ -26,14 +27,14 @@ export type OrderItemProps = {
   amount: number,
   orderId: string,
   productId: string,
-  product: {
+  Product: {
     id: string,
     name: string,
     description: string,
     price: string,
     banner: string
   }
-  order: {
+  Order: {
     id: string,
     table: string,
     status: boolean,
@@ -44,7 +45,6 @@ export type OrderItemProps = {
 export default function Dashboard({ orders }: HomeProps) {
   
   const [orderList, setOrderList] = useState(orders || [])
-  console.log(orderList)
 
   const [modalItem, setModalItem] = useState<OrderItemProps[]>()
   const [modalVisible, setModalVisible] = useState(false)
@@ -66,6 +66,27 @@ export default function Dashboard({ orders }: HomeProps) {
     setModalVisible(true)
   }
 
+  async function handleFinishItem(id: string) {
+    const apiClient = setupAPIClient()
+    await apiClient.put('/pedido/finish', {
+      orderId: id
+    })
+
+    const response = await apiClient.get('/pedidos')
+
+    setOrderList(response.data)
+    setModalVisible(false)
+    
+    toast.success('Pedido finalizado com sucesso!')
+  }
+
+  async function handleRefreshOrders() {
+    const apiClient = setupAPIClient()
+    const response = await apiClient.get('/pedidos')
+
+    setOrderList(response.data)
+  }
+
   Modal.setAppElement('#__next')
 
   return (
@@ -79,12 +100,18 @@ export default function Dashboard({ orders }: HomeProps) {
         <main className={styles.container}>
           <div className={styles.containerHeader}>
             <h1>Últimos pedidos</h1>
-            <button>
+            <button onClick={handleRefreshOrders}>
               <FiRefreshCcw size={25} color="#3FFFA3"/>
             </button>
           </div>
 
           <article className={styles.listOrders}>
+
+            {orderList.length === 0 && (
+              <span className={styles.emptyList}>
+                Nenhum pedido em aberto no momento :(
+              </span>
+            )}
 
             {orderList.map(item => (
               <section key={item.id} className={styles.orderItem}>
@@ -104,6 +131,7 @@ export default function Dashboard({ orders }: HomeProps) {
             isOpen={modalVisible}
             onRequestClose={handleCloseModal}
             order={modalItem}
+            handleFinishOrder={handleFinishItem}
           />
         )}
 
@@ -116,7 +144,6 @@ export const getServerSideProps = canSSRAuth(async (context) => {
   const apiClient = setupAPIClient(context)
 
   const response = await apiClient.get('/pedidos')
-
 
   return {
     props: {
